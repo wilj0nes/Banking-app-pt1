@@ -6,10 +6,6 @@ public class Bank{
         UserInterface ui = new UserInterface();
         ui.choice();
     }
-
-    public void something(){
-        System.out.println("asdfasdfasdf");
-    }
 }
 
 

@@ -1,12 +1,12 @@
 package com.revature.bank;
 
-import org.apache.log4j.Logger;
+//import org.apache.log4j.Logger;
 import java.io.Serializable;
 
 public class CustomerCollection implements Serializable {
 
     private static final long serialVersionUID = -6250939837132126354L;
-    private final Logger logger = Logger.getRootLogger();
+//    private final Logger logger = Logger.getRootLogger();
 
     private int maxLength = 10;
     private int currentIndex = 0;
@@ -21,7 +21,7 @@ public class CustomerCollection implements Serializable {
         User u = new User(name, pass);
         stop = false;
         for(int i = 0; i < users.length; i++){
-            logger.fatal(users[i].getUserName());
+//            logger.fatal(users[i].getUserName());
             if(users[i] == null && !stop){
                 users[i] = u;
                 System.out.println("New User --> " + users[i]);
@@ -36,13 +36,11 @@ public class CustomerCollection implements Serializable {
         for(int i = 0; i < users.length; i++){
             if(users[i] != null){
 
-                logger.fatal(users[i].getUserName());
+//                logger.fatal(users[i].getUserName());
                 if(users[i].getUserName().equals(user) && users[i].getPassWord().equals(pass)) {
                     System.out.println("user found");
                     return users[i];
                 }
-
-
             }
         }
         return null;

@@ -8,8 +8,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import org.apache.log4j.Logger;
-
 
 public class UserInterface extends Bank implements Serializable {
 
@@ -17,7 +15,6 @@ public class UserInterface extends Bank implements Serializable {
     private String userChoice;
 
     private CustomerCollection customers;
-    private Bank b;
 
     private User currentUser = null;
     private boolean go = true;
@@ -62,7 +59,7 @@ public class UserInterface extends Bank implements Serializable {
                 System.out.print("->");
                 userChoice = scan.nextLine();
 
-                //TODO make sure this is an int
+                //TODO input validation
                 userInput = Integer.parseInt(userChoice);
                 switch (userInput){
                     case 1: logIn();
@@ -82,7 +79,7 @@ public class UserInterface extends Bank implements Serializable {
                 System.out.println("4. View funds");
                 userChoice = scan.nextLine();
 
-                //TODO make sure this is an int
+                //TODO input validation
                 userInput = Integer.parseInt(userChoice);
                 switch (userInput){
                     case 1: currentUser = null;
@@ -98,6 +95,7 @@ public class UserInterface extends Bank implements Serializable {
         String username = scan.nextLine();
         System.out.print("\nPlease pick a password: ");
         String password = scan.nextLine();
+        customers.addUser(username, password);
 
 //        customers.addUser("will", "pass1");
 //        customers.addUser("jones", "pass");
