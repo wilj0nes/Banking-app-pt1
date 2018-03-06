@@ -3,9 +3,10 @@ package com.revature.bank;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.UUID;
 
-public class AccountCollection implements Serializable {
+public class AccountCollection extends CollectionHolder implements Serializable {
 
     private static final long serialVersionUID = -5726690022975290484L;
     private transient final Logger logger = LogManager.getLogger(AccountCollection.class);
@@ -13,42 +14,39 @@ public class AccountCollection implements Serializable {
 
 
     private int maxLength = 0;
-    private Account[] accounts;
-    private UUID id;
+    private ArrayList<Account> accountList;
 
     public AccountCollection() {
-        accounts = new Account[maxLength];
+        accountList = new ArrayList<>();
     }
+
+    public Account returnAccount(UUID id){
+        for(int i = 0; i < accountList.size(); i++){
+            if(accountList.get(i).getId() == id){
+                return accountList.get(i);
+            }
+        }
+        return null;
+    }
+
 
     public void createAccount(User user){
         UUID uuid = generateUUID();
         Account a = new Account(user, uuid);
-        maxLength++;
-
-        Account[] tempArr = new Account[maxLength];
-        for(int i = 0; i < accounts.length; i++){
-            tempArr[i] = accounts[i];
-        }
-
-        accounts = new Account[maxLength];
-        accounts = tempArr;
-        accounts[maxLength - 1] = a;
-        logger.trace("new account: " + accounts[maxLength - 1].getId() + ", User:" + user.getUserName());
-
-        //user.setId(accounts[maxLength - 1].getId());
-            // probably redundant
+        accountList.add(a);
     }
 
-    public Account[] getAccounts() {
-        return accounts;
-    }
+    //public Account[] getAccounts() {
+        //return accounts;
+    //}
+
 
     @Override
     public String toString(){
         String str = "";
 
-        for(int i = 0; i < accounts.length; i++){
-            str = str + "[" + accounts[i].getId() + "]";
+        for(int i = 0; i < accountList.size(); i++){
+            str = str + "[" + accountList.get(i).getId() + "]";
         }
         return str;
     }

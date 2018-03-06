@@ -3,6 +3,7 @@ package com.revature.bank;
 import com.sun.xml.internal.bind.v2.model.core.ID;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class User implements Serializable {
@@ -11,11 +12,10 @@ public class User implements Serializable {
     private String userName;
     private String passWord;
     private boolean approved = false;
-    private UUID[] IDs;              // accounts array
-    private int IDlength = 0;
+    private ArrayList<UUID> idList;
 
     public User(String user, String pass) {
-        IDs = new UUID[IDlength];
+        idList = new ArrayList<>();
         this.setUserName(user);
         this.setPassWord(pass);
     }
@@ -46,32 +46,12 @@ public class User implements Serializable {
 
     @Override
     public String toString(){
-        String str;
-
-        if(this.IDs != null){
-            str = "[Username: " + this.userName + ", " +
-                    "Password: " + this.passWord +  ", " +
-                    "ID: " + this.IDs + "]";
-        }
-        else{
-            str = "[Username: " + this.userName + ", " +
-                    "Password: " + this.passWord +  ", " +
-                    "ID: " + "N/A" + "]";
-        }
-        return str;
+        return "[" + this.getUserName() + ", " +
+                     this.getPassWord() + "]";
     }
 
     public void addID(UUID id){
-
-        IDlength++;
-
-        UUID[] tempArr = new UUID[IDlength];
-        for(int i = 0; i < IDs.length; i++){
-            tempArr[i] = IDs[i];
-        }
-        IDs = new UUID[IDlength];
-        IDs = tempArr;
-        IDs[IDlength - 1] = id;
+        idList.add(id);
     }
 
 }

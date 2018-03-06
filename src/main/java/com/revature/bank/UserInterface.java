@@ -16,33 +16,37 @@ public class UserInterface extends Bank implements Serializable {
 
     private CustomerCollection customers;
     private AccountCollection accounts;
-    private CollectionHolder objects;
 
     private User currentUser = null;
     private Account currentAccount = null;
     private boolean go = true;
-//    private File file, file2;
-
+    private CollectionHolder objs;
     private int userInput;
 
     public UserInterface(){
 
+        File f = new File("collections.dat");
+        if(f.length() == 0){
+            System.out.println("collections file is empty ");
+            objs = new CollectionHolder();
 
-        File file = new File("users.dat");
-        if(file.length() == 0){
-            System.out.println("users file is empty ");
-            customers = new CustomerCollection();
+            objs.newCC();
+            objs.newAC();
+
+            customers = objs.getCC();
+            accounts = objs.getAC();
         }
         else{
-            System.out.println("users file is not empty");
+            System.out.println("collections file is not empty");
 
             try(ObjectInputStream ois = new ObjectInputStream(
-                    new FileInputStream("users.dat"))){
+                    new FileInputStream("collections.dat"))){
 
-                customers = (CustomerCollection) ois.readObject();                         // read from file
-                System.out.println("All Users:\n" + customers);
-                ois.close();
+                objs = (CollectionHolder) ois.readObject();                         // read from file
+                System.out.println("All Users:\n" + objs);
 
+                customers = objs.getCC();
+                accounts = objs.getAC();
             }
             catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -54,7 +58,34 @@ public class UserInterface extends Bank implements Serializable {
                 e.printStackTrace();
             }
         }
-        readAccounts();
+
+
+//        File file = new File("users.dat");
+//        if(file.length() == 0){
+//            System.out.println("users file is empty ");
+//            customers = new CustomerCollection();
+//        }
+//        else{
+//            System.out.println("users file is not empty");
+//
+//            try(ObjectInputStream ois = new ObjectInputStream(
+//                    new FileInputStream("users.dat"))){
+//
+//                customers = (CustomerCollection) ois.readObject();                         // read from file
+//                System.out.println("All Users:\n" + customers);
+//                ois.close();
+//            }
+//            catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//            catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            catch (ClassNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        }
+
 
     }
 
@@ -135,13 +166,13 @@ public class UserInterface extends Bank implements Serializable {
     }
 
     public void newBankAccount(){
-        readAccounts();
         System.out.println(accounts);
         accounts.createAccount(currentUser);
     }
 
     public void viewInfo(User currentUser){
-        readAccounts();
+        //readAccounts();
+        //currentUser
     }
 
 
@@ -152,9 +183,9 @@ public class UserInterface extends Bank implements Serializable {
         String password = scan.nextLine();
         customers.addUser(username, password);
 
-        customers.addUser("will", "pass1");
-        customers.addUser("jones", "pass");
-        customers.addUser("user", "pass3");
+//        customers.addUser("will", "pass1");
+//        customers.addUser("jones", "pass");
+//        customers.addUser("user", "pass3");
 
     }
 
@@ -175,34 +206,46 @@ public class UserInterface extends Bank implements Serializable {
 
     public void stop(){
 
-        if(customers.getMaxLength() != 0){
-            try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("users.dat"))){
-                oos.writeObject(customers);                                             // write to file
-                System.out.println(customers);
-            }
-            catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        objs.setcc(customers);
+        objs.setAc(accounts);
 
-        if(accounts != null){
-            if(accounts.getMaxLength() != 0){
-                try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("accounts.dat"))){
-                    oos.writeObject(accounts);                                             // write to file
-                    System.out.println(accounts);
-                }
-                catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("collections.dat"))){
+            oos.writeObject(objs);                                             // write to file
+            System.out.println(objs);
         }
-
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+//        if(customers.getMaxLength() != 0){
+//            try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("users.dat"))){
+//                oos.writeObject(customers);                                             // write to file
+//                System.out.println(customers);
+//            }
+//            catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//            catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        if(accounts != null){
+//            if(accounts.getMaxLength() != 0){
+//                try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("accounts.dat"))){
+//                    oos.writeObject(accounts);                                             // write to file
+//                    System.out.println(accounts);
+//                }
+//                catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+//                catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        }
         go = false;
     }
 

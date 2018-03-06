@@ -4,32 +4,36 @@ import java.io.Serializable;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import java.io.Serializable;
+import java.util.ArrayList;
 
-public class CustomerCollection implements Serializable {
+public class CustomerCollection extends CollectionHolder implements Serializable {
 
     private static final long serialVersionUID = -6250939837132126354L;
     private transient final Logger logger = Logger.getRootLogger();
 
     private int maxLength = 0;
     private int currentIndex = 0;
-    private User[] users;
+    //private User[] users;
+    private ArrayList<User> userList;
 
     public CustomerCollection(){
-        users = new User[maxLength];
+        userList = new ArrayList<>();
     }
 
     public void addUser(String name, String pass){
         User u = new User(name, pass);
-        maxLength++;
 
-        User[] tempArr = new User[maxLength];
-        for(int i = 0; i < users.length; i++){
-            tempArr[i] = users[i];
-        }
 
-        users = new User[maxLength];
-        users = tempArr;
-        users[maxLength - 1] = u;
+//        maxLength++;
+//        User[] tempArr = new User[maxLength];
+//        for(int i = 0; i < users.length; i++){
+//            tempArr[i] = users[i];
+//        }
+//        users = new User[maxLength];
+//        users = tempArr;
+//        users[maxLength - 1] = u;
+
+        userList.add(u);
 
 //        logger.trace("New user: " + users[maxLength - 1].toString());
 //        for(int i = 0; i < users.length; i++){
@@ -45,33 +49,37 @@ public class CustomerCollection implements Serializable {
 
     public User checkUserAndPass(String user, String pass){
 
-        for(int i = 0; i < users.length; i++){
+//        for(int i = 0; i < users.length; i++){
+//
+//            if(users[i].getUserName().equals(user) && users[i].getPassWord().equals(pass)) {
+//                System.out.println("user found");
+//                return users[i];
+//            }
+//        }
 
-            if(users[i].getUserName().equals(user) && users[i].getPassWord().equals(pass)) {
-                System.out.println("user found");
-                return users[i];
+
+        for(int i = 0; i < userList.size(); i++){
+            System.out.println();
+            if(userList.get(i).getUserName().equals(user) &&
+               userList.get(i).getPassWord().equals(pass)){
+
+                return userList.get(i);
             }
         }
         return null;
     }
 
-    public User[] getUsers() {
-        return users;
+    public ArrayList<User> getUserList() {
+        return this.userList;
     }
 
-    public void setUsers(User[] users) {
-        this.users = users;
-    }
+
 
     @Override
     public String toString(){
         String str = "";
-        for(int i = 0; i < users.length; i++){
-            if(users[i] != null){
-                str = str + "[" + users[i].getUserName() + ", " +
-                        users[i].getPassWord() + ", " +
-                        users[i].isApproved() + "]\n";
-            }
+        for(int i = 0; i < userList.size(); i++){
+            str = str + userList.get(i).getUserName() + ", ";
         }
 
         return str;

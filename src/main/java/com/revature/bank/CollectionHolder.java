@@ -5,14 +5,27 @@ import java.io.Serializable;
 public class CollectionHolder implements Serializable {
     private transient static final long serialVersionUID = 2679870783007889695L;
 
-    private Object[] collectionArray;
+    private CustomerCollection cc;
+    private AccountCollection ac;
 
-    public CollectionHolder(){
-        collectionArray = new Object[2];
+    public void setcc(CustomerCollection cc){
+        this.cc = cc;
+    }
+    public void setAc(AccountCollection ac){
+        this.ac = ac;
     }
 
-    public void saveCollection(Object[] objArr, int index, int length){
-        collectionArray[index] = objArr;
+    public void newCC(){
+        cc = new CustomerCollection();
+    }
+    public CustomerCollection getCC(){
+        return cc;
     }
 
+    public void newAC(){
+        ac = new AccountCollection();
+    }
+    public AccountCollection getAC() {
+        return ac;
+    }
 }
