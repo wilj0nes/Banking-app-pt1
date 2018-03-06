@@ -1,5 +1,6 @@
 package com.revature.bank;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestBank {
@@ -13,12 +14,13 @@ public class TestBank {
         ui.setUserInput(1);
         ui.choice();
     }
+    @BeforeClass
 
     @Test
     public void testAddUser(){
-        cc.addUser("will", "pass");
-        cc.addUser("jones", "pass");
-        cc.toString();
+//        cc.addUser("will", "pass");
+//        cc.addUser("jones", "pass");
+//        cc.toString();
     }
 
 //    @Test

@@ -1,16 +1,17 @@
 package com.revature.bank;
 
-//import org.apache.log4j.Logger;
+import java.io.Serializable;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import java.io.Serializable;
 
 public class CustomerCollection implements Serializable {
 
     private static final long serialVersionUID = -6250939837132126354L;
-//    private final Logger logger = Logger.getRootLogger();
+    private transient final Logger logger = Logger.getRootLogger();
 
-    private int maxLength = 10;
+    private int maxLength = 0;
     private int currentIndex = 0;
-    boolean stop = false;
     private User[] users;
 
     public CustomerCollection(){
@@ -19,28 +20,36 @@ public class CustomerCollection implements Serializable {
 
     public void addUser(String name, String pass){
         User u = new User(name, pass);
-        stop = false;
+        maxLength++;
+
+        User[] tempArr = new User[maxLength];
         for(int i = 0; i < users.length; i++){
-//            logger.fatal(users[i].getUserName());
-            if(users[i] == null && !stop){
-                users[i] = u;
-                System.out.println("New User --> " + users[i]);
-                currentIndex = i;
-                stop = true;
-            }
+            tempArr[i] = users[i];
         }
+
+        users = new User[maxLength];
+        users = tempArr;
+        users[maxLength - 1] = u;
+
+//        logger.trace("New user: " + users[maxLength - 1].toString());
+//        for(int i = 0; i < users.length; i++){
+////            logger.fatal(users[i].getUserName());
+//            if(users[i] == null && !stop){
+//                users[i] = u;
+//                System.out.println("New User --> " + users[i]);
+//                currentIndex = i;
+//                stop = true;
+//            }
+//        }
     }
 
     public User checkUserAndPass(String user, String pass){
 
         for(int i = 0; i < users.length; i++){
-            if(users[i] != null){
 
-//                logger.fatal(users[i].getUserName());
-                if(users[i].getUserName().equals(user) && users[i].getPassWord().equals(pass)) {
-                    System.out.println("user found");
-                    return users[i];
-                }
+            if(users[i].getUserName().equals(user) && users[i].getPassWord().equals(pass)) {
+                System.out.println("user found");
+                return users[i];
             }
         }
         return null;
@@ -60,8 +69,8 @@ public class CustomerCollection implements Serializable {
         for(int i = 0; i < users.length; i++){
             if(users[i] != null){
                 str = str + "[" + users[i].getUserName() + ", " +
-                                  users[i].getPassWord() + ", " +
-                                  users[i].isApproved() + "]\n";
+                        users[i].getPassWord() + ", " +
+                        users[i].isApproved() + "]\n";
             }
         }
 
@@ -83,4 +92,5 @@ public class CustomerCollection implements Serializable {
         this.currentIndex = currentIndex;
     }
 }
+
 
