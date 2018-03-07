@@ -1,5 +1,7 @@
 package com.revature.bank;
 
+import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+
 import java.io.*;
 import java.util.Scanner;
 import java.io.FileInputStream;
@@ -8,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.UUID;
 
 public class UserInterface extends Bank implements Serializable {
 
@@ -121,9 +124,10 @@ public class UserInterface extends Bank implements Serializable {
             if(currentUser == null){
                 System.out.println("\nWhat would you like to do today?");
                 System.out.println("--------------------------------");
-                System.out.println("1. to Exit");
+                System.out.println("1. To Exit");
                 System.out.println("2. To login");
                 System.out.println("3. To create a profile");
+                System.out.println("4. To Erase file"); //TODO remove this
                 System.out.print("-> ");
                 userChoice = scan.nextLine();
 
@@ -135,6 +139,8 @@ public class UserInterface extends Bank implements Serializable {
                     case 2: logIn();
                         break;
                     case 3: createProfile();
+                        break;
+                    case 4: eraseFile();
                         break;
                     default: stop();
                 }
@@ -166,15 +172,122 @@ public class UserInterface extends Bank implements Serializable {
     }
 
     public void newBankAccount(){
-        System.out.println(accounts);
+        //System.out.println(accounts);
         accounts.createAccount(currentUser);
     }
 
     public void viewInfo(User currentUser){
-        //readAccounts();
-        //currentUser
+        int accountChoice = 0;
+        String input;
+        boolean viewInfoLoop = true;
+        UUID chosenID = null;
+
+
+        do{
+            System.out.println("\nPlease pick an account to view");
+            System.out.println("--------------------------------");
+            for(int i = 0; i < currentUser.getIdList().size(); i++){
+                System.out.println(i + ". " + currentUser.getIdList().get(i) + ", ");
+            }
+            System.out.print("-> ");
+            Scanner scan = new Scanner(System.in);
+            input = scan.nextLine();
+
+            //TODO input validation
+            int index = Integer.parseInt(input);
+
+            for(int i = 0; i < currentUser.getIdList().size(); i++){
+                if(i == index){
+                    chosenID = currentUser.getIdList().get(i);
+                    viewInfoLoop = false;
+                }
+            }
+        } while(viewInfoLoop);
+
+        //System.out.println("You have chosen account: " + chosenID);
+        currentAccount = accounts.returnAccount(chosenID);
+        manageAccount();
     }
 
+    public void manageAccount(){
+        boolean manageAccountLoop = true;
+
+        while(manageAccountLoop){
+            System.out.println(currentAccount.toString());
+            System.out.println("Account Options");
+            System.out.println("--------------------------------");
+            System.out.println("1. Logout");
+            System.out.println("2. Back to Profile Options");
+            System.out.println("3. Withdraw funds");
+            System.out.println("4. Deposit funds");
+            System.out.print("-> ");
+            Scanner scan = new Scanner(System.in);
+            String s = scan.nextLine();
+            int n = Integer.parseInt(s);
+
+            switch (n){
+                case 1: // Logout
+                    manageAccountLoop = false;
+                    currentUser = null;
+                    choice();
+                    break;
+                case 2: // Back to profile options
+                    manageAccountLoop = false;
+                    choice();
+                    break;
+                case 3: withdraw();
+                    break;
+                case 4: deposit();
+                    break;
+                case 9: stop();
+            }
+        }
+    }
+
+    public void withdraw(){
+        boolean wLoop = true;
+        System.out.println(currentAccount.toString());
+        while(wLoop){
+            System.out.print("Enter amount: ");
+            System.out.print("-> ");
+            Scanner scan = new Scanner(System.in);
+            String s = scan.nextLine();
+
+            float money = currentAccount.getBalance();
+            float f = Float.parseFloat(s);
+            if((money - f) < 0){
+                System.out.println("Insufficient funds");
+            }
+            else if(f < 0){
+                System.out.println("You cannot withdraw a negative amount");
+            }
+            else{
+                currentAccount.withdraw(f);
+                wLoop = false;
+            }
+        }
+    }
+
+    public void deposit(){
+        boolean dLoop = true;
+        System.out.println(currentAccount.toString());
+        while(dLoop){
+            System.out.println("Enter amount: ");
+            System.out.print("-> ");
+            Scanner scan = new Scanner(System.in);
+            String s = scan.nextLine();
+
+            float money = currentAccount.getBalance();
+            float f = Float.parseFloat(s);
+            if(f < 0){
+                System.out.println("You cannot withdraw a negative amount");
+            }
+            else{
+                currentAccount.deposit(f);
+                dLoop = false;
+            }
+        }
+    }
 
     public void createProfile(){
         System.out.print("Please pick a username: ");
@@ -182,6 +295,8 @@ public class UserInterface extends Bank implements Serializable {
         System.out.print("Please pick a password: ");
         String password = scan.nextLine();
         customers.addUser(username, password);
+
+        //TODO auto login
 
 //        customers.addUser("will", "pass1");
 //        customers.addUser("jones", "pass");
@@ -200,12 +315,27 @@ public class UserInterface extends Bank implements Serializable {
             System.out.println("Wrong username or password");
         }
         else{
-            System.out.println("User: " + currentUser.getUserName() + ", login successful");
+            System.out.println("User: " + "'" + currentUser.getUserName() + "'" + " login successful");
         }
     }
 
-    public void stop(){
 
+
+    private void eraseFile(){
+        go = false;
+        try{
+            PrintWriter writer = new PrintWriter("collections.dat");
+            writer.print("");
+            writer.close();
+        }
+        catch (FileNotFoundException e){}
+    }
+
+    public void setUserInput(int userInput) {
+        this.userInput = userInput;
+    }
+
+    public void stop(){
         objs.setcc(customers);
         objs.setAc(accounts);
 
@@ -247,17 +377,5 @@ public class UserInterface extends Bank implements Serializable {
 //            }
 //        }
         go = false;
-    }
-
-    public void stopWithoutSave(){
-        go = false;
-    }
-
-    public int getUserInput() {
-        return userInput;
-    }
-
-    public void setUserInput(int userInput) {
-        this.userInput = userInput;
     }
 }

@@ -3,6 +3,7 @@ package com.revature.bank;
 import com.sun.xml.internal.bind.v2.model.core.ID;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -11,7 +12,6 @@ public class User implements Serializable {
 
     private String userName;
     private String passWord;
-    private boolean approved = false;
     private ArrayList<UUID> idList;
 
     public User(String user, String pass) {
@@ -36,22 +36,27 @@ public class User implements Serializable {
         this.passWord = passWord;
     }
 
-    public boolean isApproved() {
-        return approved;
-    }
 
-    public void setApproved(boolean approved) {
-        this.approved = approved;
-    }
 
     @Override
     public String toString(){
-        return "[" + this.getUserName() + ", " +
-                     this.getPassWord() + "]";
+        String str;
+        str = "\n----------Profile Info----------\n";
+        str = str + "User: " + this.userName + ", " +
+                "\nPassword: " + this.passWord + "\n";
+//        for(int i = 0; i < idList.size(); i++){
+//        }
+        str = str + "User(s): " + idList + ", ";
+        str = str + "\n----------Profile Info----------\n";
+        return str;
+
     }
 
     public void addID(UUID id){
         idList.add(id);
     }
 
+    public ArrayList<UUID> getIdList() {
+        return idList;
+    }
 }

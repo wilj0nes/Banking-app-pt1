@@ -10,10 +10,8 @@ public class Account implements Serializable {
     //private User[] users;
     private ArrayList<User> userList;
     private UUID id;
-
+    private boolean approved = false;
     private float balance;
-    private int maxLength = 0;
-    private int accountNumber;
 
     public Account(User u, UUID id){
         userList = new ArrayList<>();
@@ -34,19 +32,25 @@ public class Account implements Serializable {
         balance = balance - f;
         return balance;
     }
+    public float getBalance(){
+        return this.balance;
+    }
+
 
     @Override
     public String toString(){
-        return "[" + this.id + ", " + this.balance + "]";
+        String str;
+        str = "\n----------Account Info----------\n";
+        str = str + "ID: " + this.id + ", " +
+                  "\nBalance: " + this.balance + "\n" +
+                    "Appproved: " + this.approved + "\n";
+        for(int i = 0; i < userList.size(); i++){
+            str = str + "User(s): " + userList.get(i).getUserName() + ", ";
+        }
+        str = str + "\n--------------------------------\n";
+        return str;
     }
 
-    public int getAccountNumber() {
-        return accountNumber;
-    }
-
-    public void setAccountNumber(int accountNumber) {
-        this.accountNumber = accountNumber;
-    }
 
     public void setId(UUID uuid){
         this.id = uuid;
@@ -54,6 +58,14 @@ public class Account implements Serializable {
 
     public UUID getId() {
         return id;
+    }
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
     }
 
 }

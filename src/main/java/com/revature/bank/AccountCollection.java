@@ -11,8 +11,6 @@ public class AccountCollection extends CollectionHolder implements Serializable 
     private static final long serialVersionUID = -5726690022975290484L;
     private transient final Logger logger = LogManager.getLogger(AccountCollection.class);
 
-
-
     private int maxLength = 0;
     private ArrayList<Account> accountList;
 
@@ -34,11 +32,9 @@ public class AccountCollection extends CollectionHolder implements Serializable 
         UUID uuid = generateUUID();
         Account a = new Account(user, uuid);
         accountList.add(a);
+        user.addID(uuid);
     }
 
-    //public Account[] getAccounts() {
-        //return accounts;
-    //}
 
 
     @Override
