@@ -23,17 +23,7 @@ public class CustomerCollection extends CollectionHolder implements Serializable
     public void addUser(String name, String pass){
         User u = new User(name, pass);
         userList.add(u);
-
-//        logger.trace("New user: " + users[maxLength - 1].toString());
-//        for(int i = 0; i < users.length; i++){
-////            logger.fatal(users[i].getUserName());
-//            if(users[i] == null && !stop){
-//                users[i] = u;
-//                System.out.println("New User --> " + users[i]);
-//                currentIndex = i;
-//                stop = true;
-//            }
-//        }
+        logger.debug("User: " + u.getUserName() + ", has been added to the userList");
     }
 
     public User checkUserAndPass(String user, String pass){
@@ -42,7 +32,6 @@ public class CustomerCollection extends CollectionHolder implements Serializable
             System.out.println();
             if(userList.get(i).getUserName().equals(user) &&
                userList.get(i).getPassWord().equals(pass)){
-
                 return userList.get(i);
             }
         }
@@ -59,7 +48,6 @@ public class CustomerCollection extends CollectionHolder implements Serializable
         for(int i = 0; i < userList.size(); i++){
             str = str + userList.get(i).getUserName() + ", ";
         }
-
         return str;
     }
 

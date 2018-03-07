@@ -32,6 +32,7 @@ public class AccountCollection extends CollectionHolder implements Serializable 
         accountList.add(a);
         user.addID(uuid);
         System.out.println("New account: " + uuid);
+        logger.debug(uuid + ", has been added to the accountList by " + user.getUserName());
     }
 
     public ArrayList<Account> getAccountList() {

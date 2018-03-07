@@ -63,6 +63,10 @@ public class Account implements Serializable {
         return id;
     }
 
+    public void removeOwner(User u){
+        this.userList.remove(u);
+    }
+
     public boolean isApproved() {
         return approved;
     }
@@ -70,5 +74,4 @@ public class Account implements Serializable {
     public void setApproved(boolean approved) {
         this.approved = approved;
     }
-
 }

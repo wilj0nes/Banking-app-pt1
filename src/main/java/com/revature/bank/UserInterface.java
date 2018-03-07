@@ -1,6 +1,7 @@
 package com.revature.bank;
 
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.Scanner;
@@ -17,6 +18,8 @@ public class UserInterface extends Bank implements Serializable {
     Scanner scan = new Scanner(System.in);
     private String userChoice;
 
+    private transient final Logger logger = LogManager.getLogger(AccountCollection.class);
+
     private CustomerCollection customers;
     private AccountCollection accounts;
 
@@ -31,8 +34,8 @@ public class UserInterface extends Bank implements Serializable {
     public UserInterface(){
         admin = new Admin();
 
-        File f = new File("collections.dat");
-        if(f.length() == 0){
+        File file = new File("collections.dat");
+        if(file.length() == 0){
             System.out.println("collections file is empty ");
             objs = new CollectionHolder();
 
@@ -65,60 +68,8 @@ public class UserInterface extends Bank implements Serializable {
             }
         }
 
-//        File file = new File("users.dat");
-//        if(file.length() == 0){
-//            System.out.println("users file is empty ");
-//            customers = new CustomerCollection();
-//        }
-//        else{
-//            System.out.println("users file is not empty");
-//
-//            try(ObjectInputStream ois = new ObjectInputStream(
-//                    new FileInputStream("users.dat"))){
-//
-//                customers = (CustomerCollection) ois.readObject();                         // read from file
-//                System.out.println("All Users:\n" + customers);
-//                ois.close();
-//            }
-//            catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//            catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            catch (ClassNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
 
     }
-
-//    public void readAccounts(){
-//        File file2 = new File("accounts.dat");
-//        if(file2.length() == 0){
-//            System.out.println("accounts file is empty");
-//            accounts = new AccountCollection();
-//        }
-//        else{
-//            System.out.println("accounts file is not empty");
-//
-//            try(ObjectInputStream ois = new ObjectInputStream(
-//                    new FileInputStream("users.dat"))){
-//
-//                accounts = (AccountCollection) ois.readObject();                         // read from file
-//                System.out.println("All accounts:\n" + accounts);
-//            }
-//            catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//            catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            catch (ClassNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
 
     public void choice(boolean jump){
         while(go){
@@ -211,7 +162,8 @@ public class UserInterface extends Bank implements Serializable {
 
     public void deleteProfile(){
         customers.getUserList().remove(currentUser);
-        System.out.println("'" + currentUser.getUserName()+ "'" + " has been removed");
+        //System.out.println("'" + currentUser.getUserName()+ "'" + " has been removed");
+        logger.debug("'" + currentUser.getUserName()+ "'" + " has been removed");
         //TODO deleting profile should delete account if no other owners exist
     }
 
@@ -318,18 +270,39 @@ public class UserInterface extends Bank implements Serializable {
                     choice(false);
                 }
             }
-
         } while(loop);
 
     }
 
     public void viewAllAccounts(){
-        System.out.println("\nAll Accounts");
-        System.out.println("--------------------------------");
-        for(int i = 0; i < accounts.getAccountList().size(); i++){
-            System.out.println(i + ". " + accounts.getAccountList().get(i).getId() + "\n");
-            //System.out.println("\t" + accounts.getAccountList().get(i).getUserList().toString());
-        }
+        boolean loop = true;
+        do{
+            System.out.println("\nAll Accounts");
+            System.out.println("--------------------------------");
+            for(int i = 0; i < accounts.getAccountList().size(); i++){
+                System.out.println(i + ". " + accounts.getAccountList().get(i).getId() + "\n");
+                //System.out.println("\t" + accounts.getAccountList().get(i).getUserList().toString());
+            }
+
+            System.out.println(accounts.getAccountList().size() + " Back to Profile Options");
+            System.out.print("-> ");
+            Scanner scan = new Scanner(System.in);
+            String s = scan.nextLine();
+
+            //TODO input validation
+            int index = Integer.parseInt(s);
+            for(int i = 0; i < accounts.getAccountList().size(); i++){
+                if(index == i){
+                    currentAccount = accounts.getAccountList().get(i);
+                    loop = false;
+                    choice(true);
+                }
+                else if (index == customers.getUserList().size()) {
+                    loop = false;
+                    choice(false);
+                }
+            }
+        } while(loop);
     }
 
     public void withdraw(){
@@ -351,6 +324,12 @@ public class UserInterface extends Bank implements Serializable {
             }
             else{
                 currentAccount.withdraw(f);
+                if(adminLoggedIn){
+                    logger.debug("admin withdrew " + f + " from account" + currentAccount.getId());
+                }
+                else{
+                    logger.debug(currentUser.getUserName()+ " withdrew " + f + " from account" + currentAccount.getId());
+                }
                 wLoop = false;
             }
         }
@@ -371,6 +350,12 @@ public class UserInterface extends Bank implements Serializable {
             }
             else{
                 currentAccount.deposit(f);
+                if(adminLoggedIn){
+                    logger.debug("admin deposited " + f + " into account" + currentAccount.getId());
+                }
+                else{
+                    logger.debug(currentUser.getUserName()+ " deposited " + f + " into account" + currentAccount.getId());
+                }
                 dLoop = false;
             }
         }
@@ -392,6 +377,7 @@ public class UserInterface extends Bank implements Serializable {
             }
             else{
                 System.out.println("User: " + "'" + currentUser.getUserName() + "'" + " login successful");
+                logger.debug("User: " + "'" + currentUser.getUserName() + "'" + " logged in");
             }
         }
     }
@@ -415,7 +401,6 @@ public class UserInterface extends Bank implements Serializable {
         objs.setAc(accounts);
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("collections.dat"))){
             oos.writeObject(objs);                                             // write to file
-            //System.out.println(objs);
         }
         catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -424,32 +409,5 @@ public class UserInterface extends Bank implements Serializable {
             e.printStackTrace();
         }
         go = false;
-//        if(customers.getMaxLength() != 0){
-//            try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("users.dat"))){
-//                oos.writeObject(customers);                                             // write to file
-//                System.out.println(customers);
-//            }
-//            catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//            catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        if(accounts != null){
-//            if(accounts.getMaxLength() != 0){
-//                try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("accounts.dat"))){
-//                    oos.writeObject(accounts);                                             // write to file
-//                    System.out.println(accounts);
-//                }
-//                catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//                catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
     }
 }

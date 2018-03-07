@@ -7,4 +7,3 @@ public class Bank{
         ui.choice(false);
     }
 }
-
