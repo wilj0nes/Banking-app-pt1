@@ -36,6 +36,9 @@ public class Account implements Serializable {
         return this.balance;
     }
 
+    public ArrayList<User> getUserList() {
+        return userList;
+    }
 
     @Override
     public String toString(){

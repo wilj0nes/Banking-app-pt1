@@ -12,7 +12,7 @@ public class TestBank {
     public void choiceText(){
         UserInterface ui = new UserInterface();
         ui.setUserInput(1);
-        ui.choice();
+        ui.choice(false);
     }
     @BeforeClass
 

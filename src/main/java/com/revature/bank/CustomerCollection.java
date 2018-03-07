@@ -22,17 +22,6 @@ public class CustomerCollection extends CollectionHolder implements Serializable
 
     public void addUser(String name, String pass){
         User u = new User(name, pass);
-
-
-//        maxLength++;
-//        User[] tempArr = new User[maxLength];
-//        for(int i = 0; i < users.length; i++){
-//            tempArr[i] = users[i];
-//        }
-//        users = new User[maxLength];
-//        users = tempArr;
-//        users[maxLength - 1] = u;
-
         userList.add(u);
 
 //        logger.trace("New user: " + users[maxLength - 1].toString());
@@ -49,15 +38,6 @@ public class CustomerCollection extends CollectionHolder implements Serializable
 
     public User checkUserAndPass(String user, String pass){
 
-//        for(int i = 0; i < users.length; i++){
-//
-//            if(users[i].getUserName().equals(user) && users[i].getPassWord().equals(pass)) {
-//                System.out.println("user found");
-//                return users[i];
-//            }
-//        }
-
-
         for(int i = 0; i < userList.size(); i++){
             System.out.println();
             if(userList.get(i).getUserName().equals(user) &&
@@ -73,8 +53,6 @@ public class CustomerCollection extends CollectionHolder implements Serializable
         return this.userList;
     }
 
-
-
     @Override
     public String toString(){
         String str = "";
@@ -83,6 +61,10 @@ public class CustomerCollection extends CollectionHolder implements Serializable
         }
 
         return str;
+    }
+
+    public ArrayList<User> returnAllUsers(){
+        return this.userList;
     }
 
     public int getMaxLength() {
