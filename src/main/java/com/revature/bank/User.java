@@ -42,12 +42,13 @@ public class User implements Serializable {
     public String toString(){
         String str;
         str = "\n----------Profile Info----------\n";
-        str = str + "User: " + this.userName + ", " +
+        str = str + "User: " + this.userName +
                 "\nPassword: " + this.passWord + "\n";
-//        for(int i = 0; i < idList.size(); i++){
-//        }
-        str = str + "User(s): " + idList + ", ";
-        str = str + "\n----------Profile Info----------\n";
+        str = str + "Accounts(s):\n";
+        for(int i = 0; i < idList.size(); i++){
+            str = str + "\t" + idList.get(i).toString() + "\n";
+        }
+        str = str + "--------------------------------\n";
         return str;
 
     }

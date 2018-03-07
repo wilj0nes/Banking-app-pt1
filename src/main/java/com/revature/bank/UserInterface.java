@@ -62,7 +62,6 @@ public class UserInterface extends Bank implements Serializable {
             }
         }
 
-
 //        File file = new File("users.dat");
 //        if(file.length() == 0){
 //            System.out.println("users file is empty ");
@@ -89,35 +88,34 @@ public class UserInterface extends Bank implements Serializable {
 //            }
 //        }
 
-
     }
 
-    public void readAccounts(){
-        File file2 = new File("accounts.dat");
-        if(file2.length() == 0){
-            System.out.println("accounts file is empty");
-            accounts = new AccountCollection();
-        }
-        else{
-            System.out.println("accounts file is not empty");
-
-            try(ObjectInputStream ois = new ObjectInputStream(
-                    new FileInputStream("users.dat"))){
-
-                accounts = (AccountCollection) ois.readObject();                         // read from file
-                System.out.println("All accounts:\n" + accounts);
-            }
-            catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-            catch (ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    public void readAccounts(){
+//        File file2 = new File("accounts.dat");
+//        if(file2.length() == 0){
+//            System.out.println("accounts file is empty");
+//            accounts = new AccountCollection();
+//        }
+//        else{
+//            System.out.println("accounts file is not empty");
+//
+//            try(ObjectInputStream ois = new ObjectInputStream(
+//                    new FileInputStream("users.dat"))){
+//
+//                accounts = (AccountCollection) ois.readObject();                         // read from file
+//                System.out.println("All accounts:\n" + accounts);
+//            }
+//            catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//            catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//            catch (ClassNotFoundException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     public void choice(){                                               // LogIn menu
         while(go){
@@ -140,7 +138,7 @@ public class UserInterface extends Bank implements Serializable {
                         break;
                     case 3: createProfile();
                         break;
-                    case 4: eraseFile();
+                    case 4: eraseFile();                //TODO and this
                         break;
                     default: stop();
                 }
@@ -150,7 +148,8 @@ public class UserInterface extends Bank implements Serializable {
                 System.out.println("--------------------------------");
                 System.out.println("1. Logout");
                 System.out.println("2. Create new bank account");
-                System.out.println("3. Bank account options");
+                System.out.println("3. View account info");
+                System.out.println("4. Bank account options");
                 System.out.print("-> ");
                 userChoice = scan.nextLine();
 
@@ -161,7 +160,9 @@ public class UserInterface extends Bank implements Serializable {
                         break;
                     case 2: newBankAccount();
                         break;
-                    case 3: viewInfo(currentUser);
+                    case 3: System.out.println(currentUser.toString());
+                        break;
+                    case 4: viewInfo(currentUser);
                         break;
                     case 9: stop();
                         break;
@@ -204,7 +205,6 @@ public class UserInterface extends Bank implements Serializable {
             }
         } while(viewInfoLoop);
 
-        //System.out.println("You have chosen account: " + chosenID);
         currentAccount = accounts.returnAccount(chosenID);
         manageAccount();
     }
@@ -248,7 +248,7 @@ public class UserInterface extends Bank implements Serializable {
         boolean wLoop = true;
         System.out.println(currentAccount.toString());
         while(wLoop){
-            System.out.print("Enter amount: ");
+            System.out.println("Enter amount: ");
             System.out.print("-> ");
             Scanner scan = new Scanner(System.in);
             String s = scan.nextLine();
@@ -297,11 +297,9 @@ public class UserInterface extends Bank implements Serializable {
         customers.addUser(username, password);
 
         //TODO auto login
-
 //        customers.addUser("will", "pass1");
 //        customers.addUser("jones", "pass");
 //        customers.addUser("user", "pass3");
-
     }
 
     public void logIn(){
