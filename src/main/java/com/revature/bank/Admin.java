@@ -7,7 +7,7 @@ public class Admin implements Serializable{
     private static final long serialVersionUID = -8328807712281843559L;
 
     private String userName = "admin";
-    private String passWord = "p";
+    private String passWord = "a";
 
     public String getUserName() {
         return userName;

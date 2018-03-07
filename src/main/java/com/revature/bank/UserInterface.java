@@ -117,12 +117,15 @@ public class UserInterface extends Bank implements Serializable {
                 System.out.println("\nProfile Options");
                 System.out.println("--------------------------------");
                 System.out.println("1. Logout");
-                System.out.println("2. Create new bank account");
+                System.out.println("2. Create a new bank account");
                 System.out.println("3. View Profile info");
                 System.out.println("4. View Account options");
                 if(adminLoggedIn){
                     System.out.println("----------Admin options----------");
-                    System.out.println("5. Delete '" + currentUser.getUserName() + "'");
+                    if(currentUser != null){
+                        System.out.println("5. Delete '" + currentUser.getUserName() + "'");
+                    }
+
                 }
                 System.out.print("-> ");
                 Scanner scan = new Scanner(System.in);
@@ -137,7 +140,7 @@ public class UserInterface extends Bank implements Serializable {
                 }
 
                 switch (userInput){
-                    case 1: currentUser = null;
+                    case 1: currentUser = null; // Logout
                         //go = false;
                         break;
                     case 2: newBankAccount();
@@ -146,13 +149,14 @@ public class UserInterface extends Bank implements Serializable {
                         break;
                     case 4: viewAccountInfo(currentUser);
                         break;
-                    case 5:
-                        deleteProfile();
-                        viewAllUsers();
+                    case 5:                     // delete profile
+                        if(currentUser != null){
+                            deleteProfile();
+                            viewAllUsers();
+                        }
                         break;
-                    case 9: stop();
+                    case 99: stop();
                         break;
-                    //default: stop();
                 }
             }
         }
@@ -194,7 +198,7 @@ public class UserInterface extends Bank implements Serializable {
             for(int i = 0; i < currentUser.getIdList().size(); i++){
                 System.out.println(i + ". " + currentUser.getIdList().get(i) + ", ");
             }
-            System.out.println(currentUser.getIdList().size() + ". Back to Profile Options");
+            System.out.println(currentUser.getIdList().size() + ". <-- Back to Profile Options");
             System.out.print("-> ");
             Scanner scan = new Scanner(System.in);
             input = scan.nextLine();
@@ -233,9 +237,10 @@ public class UserInterface extends Bank implements Serializable {
             System.out.println("--------------------------------");
             System.out.println("1. Logout");
             System.out.println("2. Pick a different account");
-            System.out.println("3. Back to Profile Options");
-            System.out.println("4. Withdraw funds");
-            System.out.println("5. Deposit funds");
+            System.out.println("3. Withdraw funds");
+            System.out.println("4. Deposit funds");
+            System.out.println("5. <-- Back to Profile Options");
+
             if(adminLoggedIn){
                 System.out.println("----------Admin options----------");
             }
@@ -259,13 +264,13 @@ public class UserInterface extends Bank implements Serializable {
                     break;
                 case 2: viewAccountInfo(currentUser);
                     break;
-                case 3: // Back to profile options
+                case 3: withdraw();
+                    break;
+                case 4:deposit();
+                    break;
+                case 5: // Back to profile options
                     manageAccountLoop = false;
                     choice(false);
-                    break;
-                case 4: withdraw();
-                    break;
-                case 5: deposit();
                     break;
                 case 99: stop();
                     break;
@@ -282,7 +287,7 @@ public class UserInterface extends Bank implements Serializable {
             for(int i = 0; i < customers.getUserList().size(); i++){
                 System.out.println(i + ". " + customers.getUserList().get(i).getUserName());
             }
-            System.out.println(customers.getUserList().size() + ". Back to Profile Options");
+            System.out.println(customers.getUserList().size() + ". <-- Back to Profile Options");
             System.out.print("-> ");
             Scanner scan = new Scanner(System.in);
             String s = scan.nextLine();
@@ -318,11 +323,19 @@ public class UserInterface extends Bank implements Serializable {
             System.out.println("\nAll Accounts");
             System.out.println("--------------------------------");
             for(int i = 0; i < accounts.getAccountList().size(); i++){
-                System.out.println(i + ". " + accounts.getAccountList().get(i).getId() + "\n");
-                //System.out.println("\t" + accounts.getAccountList().get(i).getUserList().toString());
+
+                if(accounts.getAccountList().get(i).getApproval()) { // approved
+                    System.out.println(i + ". " + accounts.getAccountList().get(i).getId() + "\n");
+                }
+                else{ // pending approval
+                    System.out.println(i + ". " + accounts.getAccountList().get(i).getId() + " -Pending Approval\n");
+                }
+
+//                for(int j = 0; j < accounts.)
+                //TODO display owners of accounts
             }
 
-            System.out.println(accounts.getAccountList().size() + " Back to Profile Options");
+            System.out.println(accounts.getAccountList().size() + " <-- Back to Profile Options");
             System.out.print("-> ");
             Scanner scan = new Scanner(System.in);
             String s = scan.nextLine();
@@ -340,11 +353,12 @@ public class UserInterface extends Bank implements Serializable {
                     currentAccount = accounts.getAccountList().get(i);
                     loop = false;
                     choice(true);
+                    // TODO call admin edit account method
                 }
-                else if (index == customers.getUserList().size()) {
-                    loop = false;
-                    choice(false);
-                }
+            }
+            if (index == customers.getUserList().size()) {
+                loop = false;
+                choice(false);
             }
         } while(loop);
     }
@@ -397,7 +411,6 @@ public class UserInterface extends Bank implements Serializable {
             Scanner scan = new Scanner(System.in);
             String s = scan.nextLine();
 
-            //float money = currentAccount.getBalance();
             float f = 0;
             try{
                 f = Float.parseFloat(s);
@@ -422,6 +435,10 @@ public class UserInterface extends Bank implements Serializable {
         }
     }
 
+    private Account adminEditAccount(Account account){
+        return null;
+    }
+
     private void logIn(){
         boolean loop = true;
         do{
@@ -433,6 +450,7 @@ public class UserInterface extends Bank implements Serializable {
 
             if(admin.getUserName().equals(u) && admin.getPassWord().equals(p)){
                 adminLoggedIn = true;
+                loop = false;
             }
             else{
                 currentUser = customers.checkUserAndPass(u, p);

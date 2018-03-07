@@ -7,7 +7,6 @@ import java.util.UUID;
 public class Account implements Serializable {
     private static final long serialVersionUID = 2582317066408575948L;
 
-    //private User[] users;
     private ArrayList<User> userList;
     private UUID id;
     private boolean approved = false;
@@ -40,6 +39,10 @@ public class Account implements Serializable {
         return userList;
     }
 
+    public boolean getApproval(){
+        return this.approved;
+    }
+
     @Override
     public String toString(){
         String str;
@@ -61,6 +64,10 @@ public class Account implements Serializable {
 
     public UUID getId() {
         return id;
+    }
+
+    public ArrayList getOwnersList(){
+        return this.userList;
     }
 
     public void removeOwner(User u){
