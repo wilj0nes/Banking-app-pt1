@@ -15,7 +15,6 @@ import java.util.UUID;
 
 public class UserInterface extends Bank implements Serializable {
 
-    Scanner scan = new Scanner(System.in);
     private String userChoice;
 
     private transient final Logger logger = LogManager.getLogger(AccountCollection.class);
@@ -27,7 +26,7 @@ public class UserInterface extends Bank implements Serializable {
     private Account currentAccount = null;
     private boolean go = true;
     private CollectionHolder objs;
-    private int userInput;
+    //private int userInput;
     private Admin admin;
     private boolean adminLoggedIn = false;
 
@@ -36,7 +35,7 @@ public class UserInterface extends Bank implements Serializable {
 
         File file = new File("collections.dat");
         if(file.length() == 0){
-            System.out.println("collections file is empty ");
+            //System.out.println("collections file is empty ");
             objs = new CollectionHolder();
 
             objs.newCC();
@@ -46,14 +45,13 @@ public class UserInterface extends Bank implements Serializable {
             accounts = objs.getAC();
         }
         else{
-            System.out.println("collections file is not empty");
+            //System.out.println("collections file is not empty");
 
             try(ObjectInputStream ois = new ObjectInputStream(
                     new FileInputStream("collections.dat"))){
 
                 objs = (CollectionHolder) ois.readObject();                         // read from file
-                System.out.println("All Users:\n" + objs);
-
+                //System.out.println("All Users:\n" + objs);
                 customers = objs.getCC();
                 accounts = objs.getAC();
             }
@@ -89,10 +87,16 @@ public class UserInterface extends Bank implements Serializable {
                 }
 
                 System.out.print("-> ");
+                Scanner scan = new Scanner(System.in);
                 userChoice = scan.nextLine();
+                int userInput = 0;
 
-                //TODO input validation
-                userInput = Integer.parseInt(userChoice);
+                try{
+                    userInput = Integer.parseInt(userChoice);
+                }
+                catch(NumberFormatException e){
+                    System.out.println("Invalid input");
+                }
                 switch (userInput){
                     case 1: stop();
                         break;
@@ -106,7 +110,7 @@ public class UserInterface extends Bank implements Serializable {
                         break;
                     case 6: viewAllAccounts();
                         break;
-                    default: stop();
+                    //default: stop();
                 }
             }
             else if(currentUser != null || jump){                                                                   // User menu
@@ -114,17 +118,24 @@ public class UserInterface extends Bank implements Serializable {
                 System.out.println("--------------------------------");
                 System.out.println("1. Logout");
                 System.out.println("2. Create new bank account");
-                System.out.println("3. View account info");
-                System.out.println("4. Bank account options");
+                System.out.println("3. View Profile info");
+                System.out.println("4. View Account options");
                 if(adminLoggedIn){
                     System.out.println("----------Admin options----------");
                     System.out.println("5. Delete '" + currentUser.getUserName() + "'");
                 }
                 System.out.print("-> ");
+                Scanner scan = new Scanner(System.in);
                 userChoice = scan.nextLine();
 
-                //TODO input validation
-                userInput = Integer.parseInt(userChoice);
+                int userInput = 0;
+                try{
+                    userInput = Integer.parseInt(userChoice);
+                }
+                catch(NumberFormatException e){
+                    System.out.println("Invalid input");
+                }
+
                 switch (userInput){
                     case 1: currentUser = null;
                         //go = false;
@@ -133,7 +144,7 @@ public class UserInterface extends Bank implements Serializable {
                         break;
                     case 3: System.out.println(currentUser.toString());
                         break;
-                    case 4: viewInfo(currentUser);
+                    case 4: viewAccountInfo(currentUser);
                         break;
                     case 5:
                         deleteProfile();
@@ -141,13 +152,14 @@ public class UserInterface extends Bank implements Serializable {
                         break;
                     case 9: stop();
                         break;
-                    default: stop();
+                    //default: stop();
                 }
             }
         }
     }
 
-    public void createProfile(){
+    private void createProfile(){
+        Scanner scan = new Scanner(System.in);
         System.out.print("Please pick a username: ");
         String username = scan.nextLine();
         System.out.print("Please pick a password: ");
@@ -160,20 +172,20 @@ public class UserInterface extends Bank implements Serializable {
 //        customers.addUser("user", "pass3");
     }
 
-    public void deleteProfile(){
+    private void deleteProfile(){
         customers.getUserList().remove(currentUser);
         //System.out.println("'" + currentUser.getUserName()+ "'" + " has been removed");
         logger.debug("'" + currentUser.getUserName()+ "'" + " has been removed");
         //TODO deleting profile should delete account if no other owners exist
     }
 
-    public void newBankAccount(){
+    private void newBankAccount(){
         accounts.createAccount(currentUser);
     }
 
-    public void viewInfo(User currentUser){
+    private void viewAccountInfo(User currentUser){
         String input;
-        boolean viewInfoLoop = true;
+        boolean loop = true;
         UUID chosenID = null;
 
         do{
@@ -182,26 +194,37 @@ public class UserInterface extends Bank implements Serializable {
             for(int i = 0; i < currentUser.getIdList().size(); i++){
                 System.out.println(i + ". " + currentUser.getIdList().get(i) + ", ");
             }
+            System.out.println(currentUser.getIdList().size() + ". Back to Profile Options");
             System.out.print("-> ");
             Scanner scan = new Scanner(System.in);
             input = scan.nextLine();
 
-            //TODO input validation
-            int index = Integer.parseInt(input);
+            int index = -1; // Used to be 0
+            try{
+                index = Integer.parseInt(input);
+            }
+            catch(NumberFormatException e){
+                System.out.println("Invalid input");
+            }
 
             for(int i = 0; i < currentUser.getIdList().size(); i++){
                 if(i == index){
                     chosenID = currentUser.getIdList().get(i);
-                    viewInfoLoop = false;
+                    loop = false;
+                }
+                if(index == currentUser.getIdList().size()){
+                    // back to profile options
+                    loop = false;
+                    choice(true);
                 }
             }
-        } while(viewInfoLoop);
+        } while(loop);
 
         currentAccount = accounts.returnAccount(chosenID);
         manageAccount();
     }
 
-    public void manageAccount(){
+    private void manageAccount(){
         boolean manageAccountLoop = true;
 
         while(manageAccountLoop){                                                   // Account menu
@@ -219,7 +242,14 @@ public class UserInterface extends Bank implements Serializable {
             System.out.print("-> ");
             Scanner scan = new Scanner(System.in);
             String s = scan.nextLine();
-            int n = Integer.parseInt(s);
+
+            int n = 0;
+            try{
+                n = Integer.parseInt(s);
+            }
+            catch(NumberFormatException e){
+                System.out.println("Invalid input");
+            }
 
             switch (n){
                 case 1: // Logout
@@ -227,7 +257,7 @@ public class UserInterface extends Bank implements Serializable {
                     currentUser = null;
                     choice(false);
                     break;
-                case 2: viewInfo(currentUser);
+                case 2: viewAccountInfo(currentUser);
                     break;
                 case 3: // Back to profile options
                     manageAccountLoop = false;
@@ -243,7 +273,7 @@ public class UserInterface extends Bank implements Serializable {
         }
     }
 
-    public void viewAllUsers(){
+    private void viewAllUsers(){
         boolean loop = true;
 
         do{
@@ -257,8 +287,16 @@ public class UserInterface extends Bank implements Serializable {
             Scanner scan = new Scanner(System.in);
             String s = scan.nextLine();
 
-            //TODO input validation
-            int index = Integer.parseInt(s);
+            //TODO input validation -- not tested
+            int index = -1;
+
+            try{
+                index = Integer.parseInt(s);
+            }
+            catch(NumberFormatException e){
+                System.out.println("Invalid input");
+            }
+
             for(int i = 0; i < customers.getUserList().size(); i++){
                 if(index == i){
                     currentUser = customers.getUserList().get(i);
@@ -274,7 +312,7 @@ public class UserInterface extends Bank implements Serializable {
 
     }
 
-    public void viewAllAccounts(){
+    private void viewAllAccounts(){
         boolean loop = true;
         do{
             System.out.println("\nAll Accounts");
@@ -289,8 +327,14 @@ public class UserInterface extends Bank implements Serializable {
             Scanner scan = new Scanner(System.in);
             String s = scan.nextLine();
 
-            //TODO input validation
-            int index = Integer.parseInt(s);
+            int index = -1;
+            try{
+                index = Integer.parseInt(s);
+            }
+            catch(NumberFormatException e){
+                System.out.println("Invalid input");
+            }
+
             for(int i = 0; i < accounts.getAccountList().size(); i++){
                 if(index == i){
                     currentAccount = accounts.getAccountList().get(i);
@@ -305,7 +349,7 @@ public class UserInterface extends Bank implements Serializable {
         } while(loop);
     }
 
-    public void withdraw(){
+    private void withdraw(){
         boolean wLoop = true;
         System.out.println(currentAccount.toString());
         while(wLoop){
@@ -315,7 +359,16 @@ public class UserInterface extends Bank implements Serializable {
             String s = scan.nextLine();
 
             float money = currentAccount.getBalance();
-            float f = Float.parseFloat(s);
+
+            int index = -1;
+            float f = 0;
+            try{
+                f = Float.parseFloat(s);
+            }
+            catch(NumberFormatException e){
+                System.out.println("Invalid input");
+            }
+
             if((money - f) < 0){
                 System.out.println("Insufficient funds");
             }
@@ -334,7 +387,8 @@ public class UserInterface extends Bank implements Serializable {
             }
         }
     }
-    public void deposit(){
+
+    private void deposit(){
         boolean dLoop = true;
         System.out.println(currentAccount.toString());
         while(dLoop){
@@ -343,8 +397,15 @@ public class UserInterface extends Bank implements Serializable {
             Scanner scan = new Scanner(System.in);
             String s = scan.nextLine();
 
-            float money = currentAccount.getBalance();
-            float f = Float.parseFloat(s);
+            //float money = currentAccount.getBalance();
+            float f = 0;
+            try{
+                f = Float.parseFloat(s);
+            }
+            catch(NumberFormatException e){
+                System.out.println("Invalid input");
+            }
+
             if(f < 0){
                 System.out.println("You cannot withdraw a negative amount");
             }
@@ -361,25 +422,31 @@ public class UserInterface extends Bank implements Serializable {
         }
     }
 
-    public void logIn(){
-        System.out.print("Enter your username: ");
-        String u = scan.nextLine();
-        System.out.print("Enter your password: ");
-        String p = scan.nextLine();
+    private void logIn(){
+        boolean loop = true;
+        do{
+            Scanner scan = new Scanner(System.in);
+            System.out.print("Enter your username: ");
+            String u = scan.nextLine();
+            System.out.print("Enter your password: ");
+            String p = scan.nextLine();
 
-        if(admin.getUserName().equals(u) && admin.getPassWord().equals(p)){
-            adminLoggedIn = true;
-        }
-        else{
-            currentUser = customers.checkUserAndPass(u, p);
-            if(currentUser == null){
-                System.out.println("Wrong username or password");
+            if(admin.getUserName().equals(u) && admin.getPassWord().equals(p)){
+                adminLoggedIn = true;
             }
             else{
-                System.out.println("User: " + "'" + currentUser.getUserName() + "'" + " login successful");
-                logger.debug("User: " + "'" + currentUser.getUserName() + "'" + " logged in");
+                currentUser = customers.checkUserAndPass(u, p);
+                if(currentUser == null){
+                    System.out.println("Wrong username or password");
+                    loop = true;
+                }
+                else{
+                    System.out.println("User: " + "'" + currentUser.getUserName() + "'" + " login successful");
+                    logger.debug("User: " + "'" + currentUser.getUserName() + "'" + " logged in");
+                    loop = false;
+                }
             }
-        }
+        } while(loop);
     }
 
     private void eraseFile(){
@@ -392,11 +459,7 @@ public class UserInterface extends Bank implements Serializable {
         catch (FileNotFoundException e){}
     }
 
-    public void setUserInput(int userInput) {
-        this.userInput = userInput;
-    }
-
-    public void stop(){
+    private void stop(){
         objs.setcc(customers);
         objs.setAc(accounts);
         try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("collections.dat"))){

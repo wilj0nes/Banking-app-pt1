@@ -8,6 +8,8 @@ import java.util.ArrayList;
 
 public class CustomerCollection extends CollectionHolder implements Serializable {
 
+    //TODO rename this to UserCollection
+
     private static final long serialVersionUID = -6250939837132126354L;
     private transient final Logger logger = Logger.getRootLogger();
 

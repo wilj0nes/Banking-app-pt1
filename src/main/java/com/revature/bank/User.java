@@ -36,13 +36,11 @@ public class User implements Serializable {
         this.passWord = passWord;
     }
 
-
-
     @Override
     public String toString(){
         String str;
         str = "\n----------Profile Info----------\n";
-        str = str + "User: " + this.userName +
+        str = str + "Username: " + this.userName +
                 "\nPassword: " + this.passWord + "\n";
         str = str + "Accounts(s):\n";
         for(int i = 0; i < idList.size(); i++){

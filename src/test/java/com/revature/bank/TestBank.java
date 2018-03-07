@@ -10,9 +10,9 @@ public class TestBank {
 
     @Test
     public void choiceText(){
-        UserInterface ui = new UserInterface();
-        ui.setUserInput(1);
-        ui.choice(false);
+//        UserInterface ui = new UserInterface();
+//        ui.setUserInput(1);
+//        ui.choice(false);
     }
     @BeforeClass
 
