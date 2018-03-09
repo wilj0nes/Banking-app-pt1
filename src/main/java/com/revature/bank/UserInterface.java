@@ -15,8 +15,6 @@ import java.util.UUID;
 
 public class UserInterface extends Bank implements Serializable {
 
-    private String userChoice;
-
     private transient final Logger logger = LogManager.getLogger(AccountCollection.class);
 
     private CustomerCollection customers;
@@ -61,8 +59,6 @@ public class UserInterface extends Bank implements Serializable {
                 e.printStackTrace();
             }
         }
-
-
     }
 
     public void choice(boolean jump){
@@ -110,7 +106,7 @@ public class UserInterface extends Bank implements Serializable {
                         break;
                     case 3: createProfile();
                         break;
-                    case 4: eraseFile();  //TODO and this
+                    case 4: //eraseFile();  //TODO and this
                         break;
                     case 5: viewAllUsers();
                         break;
