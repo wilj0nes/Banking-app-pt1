@@ -1,9 +1,6 @@
 package com.revature.bank;
 
-import com.sun.xml.internal.bind.v2.model.core.ID;
-
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -48,9 +45,10 @@ public class User implements Serializable {
         }
         str = str + "--------------------------------\n";
         return str;
-
     }
-
+    public void deleteUnusedUUID(UUID id){
+        this.idList.remove(id);
+    }
 
     public void addID(UUID id){
         idList.add(id);

@@ -22,14 +22,12 @@ public class Account implements Serializable {
         userList.add(user);
     }
 
-    public float deposit(float f){
+    public void deposit(float f){
         balance = balance + f;
-        return balance;
     }
 
-    public float withdraw(float f){
+    public void withdraw(float f){
         balance = balance - f;
-        return balance;
     }
     public float getBalance(){
         return this.balance;
@@ -48,15 +46,14 @@ public class Account implements Serializable {
         String str;
         str = "\n----------Account Info----------\n";
         str = str + "ID: " + this.id + ", " +
-                  "\nBalance: " + this.balance + "\n" +
-                    "Appproved: " + this.approved + "\n";
+                "\nBalance: " + this.balance + "\n" +
+                "Appproved: " + this.approved + "\n";
         for(int i = 0; i < userList.size(); i++){
             str = str + "User(s): " + userList.get(i).getUserName() + ", ";
         }
         str = str + "\n--------------------------------\n";
         return str;
     }
-
 
     public void setId(UUID uuid){
         this.id = uuid;
@@ -71,11 +68,8 @@ public class Account implements Serializable {
     }
 
     public void removeOwner(User u){
+        u.deleteUnusedUUID(this.id);
         this.userList.remove(u);
-    }
-
-    public boolean isApproved() {
-        return approved;
     }
 
     public void setApproved(boolean approved) {

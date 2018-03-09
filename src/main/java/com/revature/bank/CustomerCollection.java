@@ -25,7 +25,7 @@ public class CustomerCollection extends CollectionHolder implements Serializable
     public void addUser(String name, String pass){
         User u = new User(name, pass);
         userList.add(u);
-        logger.debug("User: " + u.getUserName() + ", has been added to the userList");
+        logger.trace("User: " + u.getUserName() + ", has been added to the userList");
     }
 
     public User checkUserAndPass(String user, String pass){
@@ -33,11 +33,18 @@ public class CustomerCollection extends CollectionHolder implements Serializable
         for(int i = 0; i < userList.size(); i++){
             System.out.println();
             if(userList.get(i).getUserName().equals(user) &&
-               userList.get(i).getPassWord().equals(pass)){
+                    userList.get(i).getPassWord().equals(pass)){
                 return userList.get(i);
             }
         }
         return null;
+    }
+
+    //TODO test this
+    public void deleteUser(User u, AccountCollection accounts){
+        accounts.deleteUnusedAccounts(u.getIdList());
+        userList.remove(u);
+        logger.trace("User: '" + u.getUserName() + "' has been deleted");
     }
 
     public ArrayList<User> getUserList() {
