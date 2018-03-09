@@ -182,8 +182,8 @@ public class UserInterface extends Bank implements Serializable {
         String username = scan.nextLine();
         System.out.print("Please pick a password: ");
         String password = scan.nextLine();
-        customers.addUser(username, password);
-        //TODO auto login
+        currentUser = customers.addUser(username, password);
+        logger.trace("User: " + currentUser.getUserName() + ", has been added to the userList");
     }
 
     private void deleteProfile(){
@@ -195,6 +195,7 @@ public class UserInterface extends Bank implements Serializable {
 
     private void newBankAccount(){
         currentAccount = accounts.createAccount(currentUser);
+        logger.trace(currentAccount + ", has been added to the accountList by " + currentUser.getUserName());
     }
 
     private void viewAccountInfo(User currentUser){

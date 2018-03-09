@@ -22,10 +22,10 @@ public class CustomerCollection extends CollectionHolder implements Serializable
         userList = new ArrayList<>();
     }
 
-    public void addUser(String name, String pass){
+    public User addUser(String name, String pass){
         User u = new User(name, pass);
         userList.add(u);
-        logger.trace("User: " + u.getUserName() + ", has been added to the userList");
+        return u;
     }
 
     public User checkUserAndPass(String user, String pass){
