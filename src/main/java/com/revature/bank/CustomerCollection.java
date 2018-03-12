@@ -19,7 +19,7 @@ public class CustomerCollection extends CollectionHolder implements Serializable
     private ArrayList<User> userList;
 
     public CustomerCollection(){
-        userList = new ArrayList<>();
+        //userList = new ArrayList<>();
     }
 
     public User addUser(String name, String pass){
@@ -44,7 +44,7 @@ public class CustomerCollection extends CollectionHolder implements Serializable
     public void deleteUser(User u, AccountCollection accounts){
         accounts.deleteUnusedAccounts(u.getIdList());
         userList.remove(u);
-        logger.trace("User: '" + u.getUserName() + "' has been deleted");
+        //logger.trace("User: '" + u.getUserName() + "' has been deleted");
     }
 
     public ArrayList<User> getUserList() {

@@ -1,8 +1,19 @@
 package com.revature.bank;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.UUID;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 public class User implements Serializable {
     private static final long serialVersionUID = 7645672315413153425L;
@@ -10,28 +21,53 @@ public class User implements Serializable {
     private String userName;
     private String passWord;
     private ArrayList<UUID> idList;
+    private int id;
 
     public User(String user, String pass) {
-        idList = new ArrayList<>();
-        this.setUserName(user);
-        this.setPassWord(pass);
+////        idList = new ArrayList<>();
+////        this.setUserName(user);
+////        this.setPassWord(pass);
+        insertUser(user, pass);
     }
+
+    public void insertUser(String user, String pass){
+        //TODO check if insert was successful
+
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "INSERT INTO USERS VALUES (" +
+                            "1,'" + user + "', '" + pass + "')";
+            //TODO make sure every thing commits
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+//            while(rs.next()){
+//                System.out.println(rs);
+//                System.out.println(rs);
+//            }
+
+            stmt.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+
 
     public String getUserName() {
         return userName;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
+
 
     public String getPassWord() {
         return passWord;
     }
 
-    public void setPassWord(String passWord) {
-        this.passWord = passWord;
-    }
 
     @Override
     public String toString(){

@@ -6,33 +6,32 @@ import org.junit.Test;
 public class TestBank {
 
     Bank bank = new Bank();
-    CustomerCollection cc = new CustomerCollection();
+    //CustomerCollection cc = new CustomerCollection();
+
 
     @Test
-    public void choiceText(){
-//        UserInterface ui = new UserInterface();
-//        ui.setUserInput(1);
-//        ui.choice(false);
-    }
-    @BeforeClass
-
-    @Test
-    public void testAddUser(){
-//        cc.addUser("will", "pass");
-//        cc.addUser("jones", "pass");
-//        cc.toString();
+    public void TestInsert(){
+        User u = new User("A", "A");
     }
 
-//    @Test
-//    public void test_checkUserAndPass(){
-//        User u = new User("will", "pass1");
-//        User uu = cc.checkUserAndPass("will", "pass1");
-//        assertEquals(u, uu);
-//    }
+    @Test
+    public void TestShowAllUsers(){
+        UserInterface ui = new UserInterface();
+        ui.showAllUsers();
+    }
 
     @Test
-    public void test_toString(){
-        System.out.println(cc.toString());
+    public void testDeleteUser(){
+        UserInterface ui = new UserInterface();
+        ui.deleteUser();
+    }
+
+    @Test
+    public void testDeposit(){
+        AccountCollection ac = new AccountCollection();
+        User u = new User("asdf", "asfd");
+        Account a = new Account(u, ac.generateUUID());
+        a.deposit(1);
     }
 
 }

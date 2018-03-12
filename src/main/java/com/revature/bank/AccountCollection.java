@@ -15,7 +15,7 @@ public class AccountCollection extends CollectionHolder implements Serializable 
     private ArrayList<Account> accountList;
 
     public AccountCollection() {
-        accountList = new ArrayList<>();
+        //accountList = new ArrayList<>();
     }
 
     public Account returnAccount(UUID id){
@@ -55,7 +55,6 @@ public class AccountCollection extends CollectionHolder implements Serializable 
         for(int i = 0; i < idList.size(); i++){
             for(int j = 0; j < accountList.size(); j++){
                 if(idList.get(i) == accountList.get(j).getId() && accountList.get(j).getUserList().size() <= 1){
-                    logger.trace(accountList.get(j).getId() + " has no Users, it has been deleted");
                     this.deleteAccount(accountList.get(j));
                 }
             }
