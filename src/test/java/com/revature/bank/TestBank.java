@@ -11,7 +11,8 @@ public class TestBank {
 
     @Test
     public void TestInsert(){
-        User u = new User("A", "A");
+        User u = new User();
+        u.insertUser("d", "d");
     }
 
     @Test
@@ -21,17 +22,17 @@ public class TestBank {
     }
 
     @Test
-    public void testDeleteUser(){
+    public void displaySQL(){
         UserInterface ui = new UserInterface();
-        ui.deleteUser();
+        ui.displaySQL();
     }
 
     @Test
-    public void testDeposit(){
-        AccountCollection ac = new AccountCollection();
-        User u = new User("asdf", "asfd");
-        Account a = new Account(u, ac.generateUUID());
-        a.deposit(1);
+    public void testDeleteUser(){
+        UserInterface ui = new UserInterface();
+        ui.deleteUser(0);
     }
+
+
 
 }

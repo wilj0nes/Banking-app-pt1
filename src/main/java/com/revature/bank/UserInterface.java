@@ -11,52 +11,25 @@ import java.sql.*;
 
 public class UserInterface extends Bank implements Serializable {
 
-    private transient final Logger logger = LogManager.getLogger(AccountCollection.class);
+    //private transient final Logger logger = LogManager.getLogger(AccountCollection.class);
 
-    private User currentUser = null;
+    public User currentUser = null;
     private Account currentAccount = null;
     private boolean go = true;
 
     private Admin admin;
     private boolean adminLoggedIn = false;
+    Scanner scan;
 
     public UserInterface(){
 
         admin = new Admin();
-//        File file = new File("collections.dat");
-//        if(file.length() == 0){
-//            objs = new CollectionHolder();
-//
-//            objs.newCC();
-//            objs.newAC();
-//
-//            customers = objs.getCC();
-//            accounts = objs.getAC();
-//        }
-//        else{
-//            try(ObjectInputStream ois = new ObjectInputStream(
-//                    new FileInputStream("collections.dat"))){
-//
-//                objs = (CollectionHolder) ois.readObject();          // read from file
-//                customers = objs.getCC();
-//                accounts = objs.getAC();
-//            }
-//            catch (FileNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//            catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            catch (ClassNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//        }
-        //this.displaySQL();
-        //this.showAllUsers();
+//        showAllUsers();
+//        showAllAccounts();
     }
 
     public void displaySQL(){
-        System.out.println("displaySQL()");
+        //System.out.println("displaySQL()");
 
         try {
             Connection conn = ConnectionFactory.getInstance().getConnection();
@@ -83,15 +56,41 @@ public class UserInterface extends Bank implements Serializable {
     public void showAllUsers(){
         try {
             Connection conn = ConnectionFactory.getInstance().getConnection();
-            String sql = "SELECT * FROM USERS ORDER BY USER_ID";
+            String sql = "SELECT * FROM USERS";
+
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next()){
+                System.out.print(rs.getInt("USER_ID") + ". ");
+                System.out.println(rs.getString("USERNAME"));
+                //System.out.println(rs.getString("TYPE"));
+            }
+
+            //stmt.close();
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+
+    public void showAllAccounts(){
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "SELECT * FROM ACCOUNTS ORDER BY ACCOUNT_ID";
 
             Statement stmt = conn.createStatement();
 
             ResultSet rs = stmt.executeQuery(sql);
 
             while(rs.next()){
-                System.out.print(rs.getInt("USER_ID") + ", ");
-                System.out.println(rs.getString("USERNAME"));
+                System.out.print(rs.getInt("ACCOUNT_ID") + ". ");
+                System.out.print(rs.getFloat("BALANCE") + ", ");
+                System.out.print(rs.getString("STATUS") + ", ");
+                System.out.print(rs.getString("TYPE") + ", \n");
             }
 
             stmt.close();
@@ -126,7 +125,7 @@ public class UserInterface extends Bank implements Serializable {
                     System.out.println("6. View all Accounts");
                 }
                 System.out.print("-> ");
-                Scanner scan = new Scanner(System.in);
+                scan = new Scanner(System.in);
                 userChoice = scan.nextLine();
                 int userInput = 0;
 
@@ -175,7 +174,7 @@ public class UserInterface extends Bank implements Serializable {
                     }
                 }
                 System.out.print("-> ");
-                Scanner scan = new Scanner(System.in);
+                 scan = new Scanner(System.in);
                 userChoice = scan.nextLine();
 
                 int userInput = 0;
@@ -201,8 +200,8 @@ public class UserInterface extends Bank implements Serializable {
                         break;
                     case 5:                                             // delete profile
                         if(currentUser != null){
-                            deleteUser();
-                            viewAllUsers();
+                            deleteUser(this.currentUser.getId());
+                            //viewAllUsers();
                         }
                         break;
                     case 6:                                             // logout
@@ -211,35 +210,29 @@ public class UserInterface extends Bank implements Serializable {
                             choice(false);
                         }
                         break;
-                    //case 99: exit();                                    // Exit
-                        //break;
                 }
             }
         }
     }
 
-    private void createProfile(){
-        Scanner scan = new Scanner(System.in);
+    public void createProfile(){
+        User u = new User();
+        scan = new Scanner(System.in);
         System.out.print("Please pick a username: ");
         String username = scan.nextLine();
         System.out.print("Please pick a password: ");
         String password = scan.nextLine();
+        u.insertUser(username, password);
+        this.currentUser = searchUser(username, password);
 
-        //currentUser = customers.addUser(username, password);
-        //logger.trace("User: " + currentUser.getUserName() + ", has been added to the userList");
     }
 
-    public void deleteUser(){
-        //customers.getUserList().remove(currentUser);
-        //customers.deleteUser(currentUser, this.accounts);
-        //logger.trace("'" + currentUser.getUserName()+ "'" + " has been removed");
-
-        String user = "will";
-        String pass = "pass";
+    @SuppressWarnings("Duplicates")
+    public void deleteUser(int id){
         try {
             Connection conn = ConnectionFactory.getInstance().getConnection();
             String sql = "DELETE FROM USERS " +
-                    "WHERE USER_ID = " + 2;
+                    "WHERE USER_ID = " + id;
             //TODO make sure every thing commits
             Statement stmt = conn.createStatement();
 
@@ -263,26 +256,63 @@ public class UserInterface extends Bank implements Serializable {
         showAllUsers();
     }
 
+    @SuppressWarnings("Duplicates")
+    public void deleteAccount(int id){
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "DELETE FROM ACCOUNTS " +
+                    "WHERE ACCOUNT_ID = " + id;
+            //TODO make sure every thing commits
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+//            while(rs.next()){
+//                System.out.println(rs);
+//                System.out.println(rs);
+//            }
+            sql = "COMMIT";
+            rs = stmt.executeQuery(sql);
+
+            stmt.close();
+        }
+        catch (SQLException e) {
+            //e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+    }
+
     private void newBankAccount(){
-        //currentAccount = accounts.createAccount(currentUser);
-        logger.trace(currentAccount + ", has been added to the accountList by " + currentUser.getUserName());
+        Account a = new Account();
+        a.insertAccount(currentUser.getId());
+
+
+        //System.out.println("----->" + );
+
+        currentAccount = searchAccount(a.getId());
+        System.out.println(currentAccount.toString());
     }
 
     private void viewAccountInfo(User currentUser){
         String input;
         boolean loop = true;
-        UUID chosenID = null;
 
-        do{
-            System.out.println("\nPlease pick an account to view");
-            System.out.println("--------------------------------");
-            for(int i = 0; i < currentUser.getIdList().size(); i++){
-                System.out.println(i + ". " + currentUser.getIdList().get(i) + ", ");
-            }
-            System.out.println(currentUser.getIdList().size() + ". Back to Profile Options <--");
+        System.out.println("\nPlease pick an account to view");
+        System.out.println("--------------------------------");
+
+        showAllAccounts();
+        while(loop){
+
             System.out.print("-> ");
-            Scanner scan = new Scanner(System.in);
+            scan = new Scanner(System.in);
             input = scan.nextLine();
+            if(input == "back"){
+                currentAccount = searchAccount(2);
+                loop = false;
+                choice(true);
+            }
 
             int index = -1;
             try{
@@ -292,22 +322,19 @@ public class UserInterface extends Bank implements Serializable {
                 System.out.println("Invalid input");
             }
 
-            if(index == currentUser.getIdList().size()){
-                // back to profile options
-                loop = false;
-                choice(true);
-            }
-            for(int i = 0; i < currentUser.getIdList().size(); i++){
-                if(i == index){
-                    chosenID = currentUser.getIdList().get(i);
-                    loop = false;
-                }
-            }
+            currentAccount = searchAccount(index);
 
-        } while(loop);
+            //System.out.println(currentAccount.toString());
 
-        //currentAccount = accounts.returnAccount(chosenID);
-        manageAccount();
+
+            //currentAccount = accounts.returnAccount(chosenID);
+            if(adminLoggedIn){
+                adminEditAccount(currentAccount);
+            }
+            else{
+                manageAccount();
+            }
+        }
     }
 
 
@@ -330,7 +357,7 @@ public class UserInterface extends Bank implements Serializable {
                 System.out.println("6. Delete User");
             }
             System.out.print("-> ");
-            Scanner scan = new Scanner(System.in);
+            scan = new Scanner(System.in);
             String s = scan.nextLine();
 
             int n = 0;
@@ -359,7 +386,7 @@ public class UserInterface extends Bank implements Serializable {
                     choice(false);
                 case 6:
                     if(currentUser != null){
-                        deleteUser();
+                        deleteUser(currentUser.getId());
                         //accounts.deleteUnusedAccounts(currentUser.getIdList());
                     }
                     break;
@@ -369,26 +396,27 @@ public class UserInterface extends Bank implements Serializable {
 
     private void viewAllUsers(){
         boolean loop = true;
+        showAllUsers();
 
-//        do{
-//            System.out.println("\nAll Users");
-//            System.out.println("--------------------------------");
+        do{
+            System.out.println("\nAll Users");
+            System.out.println("--------------------------------");
 //            for(int i = 0; i < customers.getUserList().size(); i++){
 //                System.out.println(i + ". " + customers.getUserList().get(i).getUserName());
 //            }
-//            System.out.println(customers.getUserList().size() + ". Go back <--");
-//            System.out.print("-> ");
-//            Scanner scan = new Scanner(System.in);
-//            String s = scan.nextLine();
-//
-//            int index = -1;
-//            try{
-//                index = Integer.parseInt(s);
-//            }
-//            catch(NumberFormatException e){
-//                System.out.println("Invalid input");
-//            }
-//
+            //System.out.println(customers.getUserList().size() + ". Go back <--");
+            System.out.print("-> ");
+            Scanner scan = new Scanner(System.in);
+            String s = scan.nextLine();
+
+            int index = -1;
+            try{
+                index = Integer.parseInt(s);
+            }
+            catch(NumberFormatException e){
+                System.out.println("Invalid input");
+            }
+
 //            for(int i = 0; i < customers.getUserList().size(); i++){
 //                if(index == i){
 //                    currentUser = customers.getUserList().get(i);
@@ -400,41 +428,29 @@ public class UserInterface extends Bank implements Serializable {
 //                    choice(false);
 //                }
 //            }
-//        } while(loop);
+        } while(loop);
     }
 
     private void viewAllAccounts(){
         boolean loop = true;
-//        do{
-//            System.out.println("\nAll Accounts");
-//            System.out.println("--------------------------------");
-//            for(int i = 0; i < accounts.getAccountList().size(); i++){
-//
-//                if(accounts.getAccountList().get(i).getApproval()) { // approved
-//                    System.out.println(i + ". " + accounts.getAccountList().get(i).getId());
-//                }
-//                else{ // pending approval
-//                    System.out.println(i + ". " + accounts.getAccountList().get(i).getId() + " -Pending Approval");
-//                }
-//                System.out.print("\tOwner(s): ");
-//                for(int j = 0; j < accounts.getAccountList().get(i).getUserList().size(); j++){
-//                    System.out.println( accounts.getAccountList().get(i).getUserList().get(j).getUserName() + ", ");
-//                }
-//            }
-//
-//            System.out.println(accounts.getAccountList().size() + ". Go back <--");
-//            System.out.print("-> ");
-//            Scanner scan = new Scanner(System.in);
-//            String s = scan.nextLine();
-//
-//            int index = -1;
-//            try{
-//                index = Integer.parseInt(s);
-//            }
-//            catch(NumberFormatException e){
-//                System.out.println("Invalid input");
-//            }
-//
+
+        do{
+            System.out.println("\nAll Accounts");
+            System.out.println("--------------------------------");
+            showAllAccounts();
+            System.out.print("-> ");
+            Scanner scan = new Scanner(System.in);
+            String s = scan.nextLine();
+            showAllAccounts();
+
+            int index = -1;
+            try{
+                index = Integer.parseInt(s);
+            }
+            catch(NumberFormatException e){
+                System.out.println("Invalid input");
+            }
+
 //            for(int i = 0; i < accounts.getAccountList().size(); i++){
 //                if(index == i){
 //                    currentAccount = accounts.getAccountList().get(i);
@@ -447,7 +463,7 @@ public class UserInterface extends Bank implements Serializable {
 //                loop = false;
 //                choice(false); // back to profile options
 //            }
-//        } while(loop);
+        } while(loop);
     }
 
 
@@ -457,7 +473,7 @@ public class UserInterface extends Bank implements Serializable {
         while(loop){
             System.out.println("Enter amount: ");
             System.out.print("-> ");
-            Scanner scan = new Scanner(System.in);
+             scan = new Scanner(System.in);
             String s = scan.nextLine();
 
             float money = currentAccount.getBalance();
@@ -477,12 +493,12 @@ public class UserInterface extends Bank implements Serializable {
                 System.out.println("You cannot withdraw a negative amount");
             }
             else{
-                currentAccount.withdraw(f);
+                withdrawFunds(f, currentAccount.getId());
                 if(adminLoggedIn){
-                    logger.trace("admin withdrew " + f + " from account " + currentAccount.getId());
+//                    logger.trace("admin withdrew " + f + " from account " + currentAccount.getId());
                 }
                 else{
-                    logger.trace(currentUser.getUserName()+ " withdrew " + f + " from account " + currentAccount.getId());
+//                    logger.trace(currentUser.getUserName()+ " withdrew " + f + " from account " + currentAccount.getId());
                 }
                 loop = false;
             }
@@ -497,7 +513,7 @@ public class UserInterface extends Bank implements Serializable {
         while(loop){
             System.out.println("Enter amount: ");
             System.out.print("-> ");
-            Scanner scan = new Scanner(System.in);
+             scan = new Scanner(System.in);
             String s = scan.nextLine();
 
             float f = 0;
@@ -513,12 +529,13 @@ public class UserInterface extends Bank implements Serializable {
                 System.out.println("You cannot withdraw a negative amount");
             }
             else{
-                currentAccount.deposit(f);
+                //currentAccount.deposit(f, currentUser.getId());
+                depositFunds(f, currentAccount.getId());
                 if(adminLoggedIn){
-                    logger.trace("admin deposited " + f + " into account " + currentAccount.getId());
+//                    logger.trace("admin deposited " + f + " into account " + currentAccount.getId());
                 }
                 else{
-                    logger.trace(currentUser.getUserName()+ " deposited " + f + " into account " + currentAccount.getId());
+//                    logger.trace(currentUser.getUserName()+ " deposited " + f + " into account " + currentAccount.getId());
                 }
                 loop = false;
             }
@@ -540,7 +557,7 @@ public class UserInterface extends Bank implements Serializable {
             System.out.println("7. Back <--");
             System.out.print("-> ");
 
-            Scanner scan = new Scanner(System.in);
+             scan = new Scanner(System.in);
             String s = scan.nextLine();
             int n = 0;
             try{
@@ -559,46 +576,169 @@ public class UserInterface extends Bank implements Serializable {
                     break;
                 case 3: deposit();
                     break;
-                case 4: account.setApproved(true);
+                case 4: setApprovedOrDeny(true);
                     break;
-                case 5: account.setApproved(false);
+                case 5: setApprovedOrDeny(false);
                     break;
-                case 6: //accounts.deleteAccount(account);
+                case 6: deleteAccount(this.currentUser.getId());
                     break;
-                case 7: choice(true); // to profile options
+                case 7:
                     loop = false;
+                    choice(true); // to profile options
                     break;
             }
         } while (loop);
     }
 
-
     private void logIn(){
+        User user = new User();
+        //user = null;
         boolean loop = true;
         do{
-            Scanner scan = new Scanner(System.in);
+            scan = new Scanner(System.in);
             System.out.print("Enter your username: ");
             String u = scan.nextLine();
             System.out.print("Enter your password: ");
             String p = scan.nextLine();
 
-//            if(admin.getUserName().equals(u) && admin.getPassWord().equals(p)){
-//                adminLoggedIn = true;
-//                loop = false;
-//            }
-//            else{
-//                currentUser = customers.checkUserAndPass(u, p);
-//                if(currentUser == null){
-//                    System.out.println("Wrong username or password");
-//                    loop = true;
-//                }
-//                else{
-//                    System.out.println("User: " + "'" + currentUser.getUserName() + "'" + " login successful");
-//                    logger.trace("User: " + "'" + currentUser.getUserName() + "'" + " logged in");
-//                    loop = false;
-//                }
-//            }
+
+
+            currentUser = searchUser(u, p);
+
+            //System.out.println(currentUser.toString());
+
+            if(u.equals("admin") && p.equals("a")){
+                System.out.println("Admin login sucessful");
+                adminLoggedIn = true;
+                loop = false;
+                choice(true);
+
+            }
+            else if(currentUser != null){
+                //System.out.println("Welcome Back!");
+                try{
+                    BufferedReader br = new BufferedReader(
+                            new FileReader("Success.txt"));
+
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        System.out.println(line);
+                    }
+                }
+                catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                catch (IOException e){}
+                System.out.println("\n");
+                this.currentUser = user;
+                loop = false;
+                choice(true);
+            }
+            else{
+                System.out.println("Wrong username or password");
+                loop = true;
+            }
         } while(loop);
+    }
+
+    @SuppressWarnings("Duplicates")
+    public Account searchAccount(int id){
+        Account a = new Account();
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+
+            String sql = "SELECT * FROM ACCOUNTS WHERE ACCOUNT_ID = " + id;
+
+            //TODO make sure every thing commits
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next()){
+                System.out.println(rs.getInt("ACCOUNT_ID") + "--------------");
+                a.setId(rs.getInt("ACCOUNT_ID"));
+                a.setStatus(rs.getString("STATUS"));
+                a.setBalance(rs.getFloat("BALANCE"));
+                a.setType(rs.getString("TYPE"));
+            }
+
+//            System.out.println(rs.getInt("ACCOUNT_ID") + "--------------");
+//            a.setId(rs.getInt("ACCOUNT_ID"));
+//            a.setStatus(rs.getString("STATUS"));
+//            a.setBalance(rs.getFloat("BALANCE"));
+//            a.setType(rs.getString("TYPE"));
+            stmt.close();
+            return a;
+            //TODO insert into joint table using the user id;
+        }
+        catch (SQLException e) {
+            //e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        return null;
+
+    }
+
+    public User searchUser(String user, String pass){
+        User u = new User();
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "SELECT * FROM" + " USERS WHERE USERNAME = '" + user + "'";
+            //TODO make sure every thing commits
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next()){
+//                u.setId(rs.getInt("USER_ID"));
+//                u.setUserName(rs.getString("USERNAME"));
+//                u.setPassWord(rs.getString("PASSWORD"));
+                u.setId(rs.getInt("USER_ID"));
+                u.setUserName(rs.getString("USERNAME"));
+                u.setPassWord(rs.getString("PASSWORD"));
+            }
+            System.out.println(u.getId());
+            stmt.close();
+            return u;
+        }
+        catch (SQLException e) {
+            //e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Account returnAccount(int n){
+        Account a = new Account();
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "SELECT * FROM ACCOUNTS" +
+                    "WHERE ACCOUNT_ID = " + n;
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while(rs.next()){
+                a.setId(rs.getInt("ACCOUNT_ID"));
+                a.setStatus(rs.getString("STATUS"));
+                a.setBalance(rs.getFloat("BALANCE"));
+                a.setType(rs.getString("TYPE"));
+            }
+
+            stmt.close();
+            return a;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        return a;
     }
 
     private void eraseFile(){
@@ -614,6 +754,21 @@ public class UserInterface extends Bank implements Serializable {
     }
 
     private void exit(){
+        go = false;
+        try{
+            BufferedReader br = new BufferedReader(
+                    new FileReader("goodbye.txt"));
+
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e){}
+        System.out.println("\n");
 //        objs.setcc(customers);
 //        objs.setAc(accounts);
 //        try(ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("collections.dat"))){
@@ -625,6 +780,124 @@ public class UserInterface extends Bank implements Serializable {
 //        catch (IOException e) {
 //            e.printStackTrace();
 //        }
-        go = false;
+
+    }
+
+    @SuppressWarnings("Duplicates")
+    public void setApprovedOrDeny(boolean b){
+
+        if(b){
+            currentAccount.setStatus("Approved");
+        }
+        else{
+            currentAccount.setStatus("Denied");
+        }
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "UPDATE ACCOUNTS SET STATUS = " + currentAccount.getStatus() + " " +
+                            "WHERE ACCOUNT_ID = " + currentAccount.getId();
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(sql);
+            stmt.close();
+        }
+        catch (SQLException e) {
+            //e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        commit();
+    }
+
+    @SuppressWarnings("Duplicates")
+    public void depositFunds(float f, int id){
+        currentAccount.setBalance(currentAccount.getBalance() + f);
+
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "UPDATE ACCOUNTS SET BALANCE = " + currentAccount.getBalance() + " WHERE ACCOUNT_ID = " + id;
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(sql);
+            stmt.close();
+        }
+        catch (SQLException e) {
+            //e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+        try{
+            BufferedReader br = new BufferedReader(
+                    new FileReader("money.txt"));
+
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e){}
+        System.out.println("\n");
+        commit();
+    }
+
+    @SuppressWarnings("Duplicates")
+    public void withdrawFunds(float f, int id){
+        currentAccount.setBalance(currentAccount.getBalance() - f);
+
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "UPDATE ACCOUNTS SET BALANCE = " + currentAccount.getBalance() + " WHERE ACCOUNT_ID = " + id;
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(sql);
+            stmt.close();
+        }
+        catch (SQLException e) {
+            //e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
+        try{
+            BufferedReader br = new BufferedReader(
+                    new FileReader("money.txt"));
+
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
+            }
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        catch (IOException e){}
+        commit();
+    }
+
+
+
+    public void commit(){
+        User u = new User();
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "COMMIT";
+            //TODO make sure every thing commits
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            System.out.println(u.getId());
+            stmt.close();
+        }
+        catch (SQLException e) {
+            //e.printStackTrace();
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
     }
 }

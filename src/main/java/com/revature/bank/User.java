@@ -1,19 +1,9 @@
 package com.revature.bank;
 
 import java.io.Serializable;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.UUID;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 public class User implements Serializable {
     private static final long serialVersionUID = 7645672315413153425L;
@@ -23,29 +13,59 @@ public class User implements Serializable {
     private ArrayList<UUID> idList;
     private int id;
 
-    public User(String user, String pass) {
-////        idList = new ArrayList<>();
-////        this.setUserName(user);
-////        this.setPassWord(pass);
-        insertUser(user, pass);
-    }
+
 
     public void insertUser(String user, String pass){
+        System.out.println("insert user: " + user);
         //TODO check if insert was successful
+        //TODO make sure every thing commits
 
         try {
             Connection conn = ConnectionFactory.getInstance().getConnection();
             String sql = "INSERT INTO USERS VALUES (" +
-                            "1,'" + user + "', '" + pass + "')";
-            //TODO make sure every thing commits
+                    "1,'" + user + "', '" + pass + "')";
+
+
+            Statement stmt = conn.createStatement();
+
+            ResultSet rs = stmt.executeQuery(sql);
+            System.out.println(rs.getString("USERNAME"));
+
+
+//            this.setUserName(rs.getString("USERNAME"));
+//            this.setPassWord(rs.getString("PASSWORD"));
+//            this.setId(rs.getInt("ACCOUNT_ID"));
+
+
+            stmt.close();
+        }
+        catch (SQLException e) {
+            //e.printStackTrace(); //TODO so something about this eventually
+        }
+        catch (NullPointerException e){
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+    @SuppressWarnings("Duplicates")
+    public User returnUser(int n){
+        User u = new User();
+        try {
+            Connection conn = ConnectionFactory.getInstance().getConnection();
+            String sql = "SELECT * FROM USERS" +
+                    "WHERE USER_ID = " + n;
             Statement stmt = conn.createStatement();
 
             ResultSet rs = stmt.executeQuery(sql);
 
-//            while(rs.next()){
-//                System.out.println(rs);
-//                System.out.println(rs);
-//            }
+            while(rs.next()){
+                u.id = rs.getInt("USER_ID");
+                u.userName = rs.getString("USERNAME");
+                u.passWord = rs.getString("PASSWORD");
+            }
 
             stmt.close();
         }
@@ -55,15 +75,27 @@ public class User implements Serializable {
         catch (NullPointerException e){
             e.printStackTrace();
         }
+        return u;
     }
 
 
     public String getUserName() {
         return userName;
     }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
+    public int getId(){
+        return this.id;
+    }
+    public void setId(int n){
+        this.id = n;
+    }
 
-
+    public void setPassWord(String s){
+        this.passWord = s;
+    }
     public String getPassWord() {
         return passWord;
     }
@@ -74,23 +106,21 @@ public class User implements Serializable {
         String str;
         str = "\n----------Profile Info----------\n";
         str = str + "Username: " + this.userName +
-                "\nPassword: " + this.passWord + "\n";
-        str = str + "Accounts(s):\n";
-        for(int i = 0; i < idList.size(); i++){
-            str = str + "\t" + idList.get(i).toString() + "\n";
-        }
+                "\nPassword: " + this.passWord + "\n" +
+                "ID: " + this.id + "\n";
+//        str = str + "Accounts(s):\n";
+//        for(int i = 0; i < idList.size(); i++){
+//            str = str + "\t" + idList.get(i).toString() + "\n";
+//        }
         str = str + "--------------------------------\n";
         return str;
     }
-    public void deleteUnusedUUID(UUID id){
-        this.idList.remove(id);
-    }
 
-    public void addID(UUID id){
-        idList.add(id);
-    }
+
 
     public ArrayList<UUID> getIdList() {
         return idList;
     }
+
+
 }
